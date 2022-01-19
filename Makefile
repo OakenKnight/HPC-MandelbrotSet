@@ -6,10 +6,17 @@ seq-fractal: code/seq-fractal.c
 shared-fractal: code/shared-fractal.c
 	@echo "\e[01;32mGenerating shared memory fractal algorithm files...\e[00m"
 	gcc code/shared-fractal.c -g -Wall -fopenmp --std=c99 -lX11 -lm -o shared-fractal
+distributed-fractal: code/distributed-fractal.c
+	@echo "\e[01;32mGenerating distributed memory fractal algorithm files...\e[00m"
+	mpicc code/distributed-fractal.c --std=c99 -fopenmp  -lX11 -lm -o distributed-fractal
+run_distrib: ./distributed-fractal
+	mpiexec ./distributed-fractal
 clean:
 	@echo "\e[01;32mDeleting temporary files...\e[00m"
 	@rm -f $(COMPILER_CLEAN)
 	@rm -f seq-fractal
-	@rm -f fractal.jpg
+	@rm -f fractal-images/fractal.jpg
 	@rm -f shared-fractal
-	@rm -f shared-fractal.jpg
+	@rm -f fractal-images/shared-fractal.jpg
+	@rm -f distributed-fractal
+	@rm -f fractal-images/distrib-fractal.jpg
