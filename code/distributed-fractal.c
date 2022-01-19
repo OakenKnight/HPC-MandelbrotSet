@@ -54,7 +54,7 @@ void run(int maxiter, int current_processor, int processors_amount, int width, i
 	char* result;
     int part_width =  (width*height) / processors_amount;
     int start = current_processor * part_width;
-    char* partial_result = (char *) malloc(width*height); // double size on the host
+    char* partial_result = (char *) malloc(part_width); // double size on the host
 
 	clock_t begin;
 	clock_t end;
