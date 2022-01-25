@@ -44,13 +44,14 @@ static int compute_point( double x, double y, int max )
 Compute an entire image, writing each point to the given bitmap.
 Scale the image to the range (xmin-xmax,ymin-ymax).
 */
-
 void compute_image( double xmin, double xmax, double ymin, double ymax, int maxiter, int width, int height)
 {
 	int i,j;
 
 	// For every pixel i,j, in the image...
     char buffer[width*height];
+
+
 
 	for(i=0;i<height;i++) {
 		for(j=0;j<width;j++) {
@@ -83,8 +84,8 @@ int main( int argc, char *argv[] )
 	double ymin=-1.0;
 	double ymax= 1.0;
 
-    int width = 120;
-    int height = 120;
+    int width = 1000;
+    int height = 1000;
 
 	// Maximum number of iterations to compute.
 	// Higher values take longer but have more detail.
