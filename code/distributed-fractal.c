@@ -35,7 +35,6 @@ void compute_image( double xmin, double xmax, double ymin, double ymax, int maxi
 	double xstep = (xmax-xmin) / (width-1);
 	double ystep = (ymax-ymin) / (height-1);
 
-	// Svaki proces ce paralelno izvrsavati ovu petlju, privatna promenljiva su i, iter
     #pragma omp parallel shared(result, maxiter, start, end) private(i,iter)
     #pragma omp for schedule(runtime)
     for (i = start; i < end; i++) {
@@ -57,7 +56,7 @@ void run(int maxiter, int current_processor, int processors_amount, int width, i
 	char* result = (char *) malloc(width*height);
     int part_width =  (width*height) / processors_amount;
     int start = current_processor * part_width;
-    char* partial_result = (char *) malloc(part_width); // double size on the host
+    char* partial_result = (char *) malloc(part_width); 
 
 	clock_t begin;
 	clock_t end;
@@ -79,7 +78,6 @@ void run(int maxiter, int current_processor, int processors_amount, int width, i
 	MPI_Gather(partial_result, part_width, MPI_CHAR, result, part_width, MPI_CHAR, 0, MPI_COMM_WORLD);
 
 	  if (current_processor == 0) {
-        // printf((now() - first_measure);
 		end = clock();
 		double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
@@ -96,7 +94,6 @@ void run(int maxiter, int current_processor, int processors_amount, int width, i
 
 int  main( int argc, char **argv ){
 
-	// The initial boundaries of the fractal image in x,y space.
 	double xmin=-1.5;
 	double xmax= 0.5;
 	double ymin=-1.0;
@@ -107,21 +104,15 @@ int  main( int argc, char **argv ){
 	int maxiter=5000;
 
 
-
-	// printf("Coordinates: %lf %lf %lf %lf\n",xmin,xmax,ymin,ymax);
-
-
     int size, rank;
 	
-	//	INITIALIZE THE MPI ENV
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	run(maxiter, rank, size, width, height, xmin, xmax, ymin, ymax) ;
 
-	//	FINALIZE MPI ENV
-    // MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Finalize();
 	return 0;
 }	
