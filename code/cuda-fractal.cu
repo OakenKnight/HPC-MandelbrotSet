@@ -100,8 +100,8 @@ static void run(double xmin, double xmax, double ymin, double ymax, int width, i
 int main(int argc, char** argv){
     cudaError_t err = cudaSuccess;
 
-    int width = 500;
-    int height = 500;
+    int width = 300;
+    int height = 300;
     int max_iter = 25000;
         
     double xmin=-1.5;
