@@ -155,6 +155,7 @@ void compute_image( double xmin, double xmax, double ymin, double ymax, int maxi
 int main( int argc, char *argv[] )
 {
 	// The initial boundaries of the fractal image in x,y space.
+	printf("adfasda");
 
 	double xmin=-1.5;
 	double xmax= 0.5;
@@ -165,6 +166,7 @@ int main( int argc, char *argv[] )
     int height = 1000;
 	int threadct = omp_get_max_threads();
 	int maxiter=5000;
+	printf("adfasda");
 
 	if (argc > 1)
     	threadct = atoi(argv[1]);
@@ -177,6 +179,7 @@ int main( int argc, char *argv[] )
 	// Showing the configuration, just in case you want to recreate it.
 	printf("Coordinates: %lf %lf %lf %lf\n",xmin,xmax,ymin,ymax);
 	printf("Timer started\n");
+	printf("adfasda2");
 
 	// clock_t begin = clock();
 	// clock_t end = clock();
@@ -185,6 +188,8 @@ int main( int argc, char *argv[] )
 	double start; 
 	double end; 
 	start = omp_get_wtime(); 
+		printf("adfasda3");
+
 	compute_image(xmin,xmax,ymin,ymax,maxiter, width, height,threadct);
 
 	end = omp_get_wtime(); 

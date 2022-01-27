@@ -33,7 +33,7 @@ void compute_image( double xmin, double xmax, double ymin, double ymax, int maxi
 	double xstep = (xmax-xmin) / (width-1);
 	double ystep = (ymax-ymin) / (height-1);
 
-	// Svaki proces ce paralelno izvrsavati ovu petlju, privatna promenljiva je i, iter
+	// Svaki proces ce paralelno izvrsavati ovu petlju, privatna promenljiva su i, iter
     #pragma omp parallel shared(result, maxiter, start, end) private(i,iter)
     #pragma omp for schedule(runtime)
     for (i = start; i < end; i++) {
@@ -91,9 +91,9 @@ int  main( int argc, char **argv ){
 	double ymin=-1.0;
 	double ymax= 1.0;
 
-    int width = 1000;
-    int height = 1000;
-	int maxiter=5000;
+    int width = 4096;
+    int height = 4096;
+	int maxiter=10000;
 
 
 
