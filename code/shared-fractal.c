@@ -125,23 +125,19 @@ void compute_image( double xmin, double xmax, double ymin, double ymax, int maxi
 {
 	int i,j;
 
-	// For every pixel i,j, in the image...
     char buffer[width*height];
-	// int max_num_threads = omp_get_max_threads();
+
 	#pragma omp parallel num_threads(threads)
 	#pragma omp for collapse(2)
 	for(i=0;i<height;i++) {
 		for(j=0;j<width;j++) {
 
-			// Scale from pixels i,j to coordinates x,y
 			double x = xmin + i*(xmax-xmin)/width;
 
 			double y = ymin + j*(ymax-ymin)/height;
 
-			// Compute the iterations at x,y
 			int iter = compute_point(x,y,maxiter);
 
-			// Convert a iteration number to an RGB color.
 			int gray = 255 * iter / maxiter;
             
             buffer[j*height+i] = (char) gray;
@@ -152,49 +148,63 @@ void compute_image( double xmin, double xmax, double ymin, double ymax, int maxi
 
 }
 
+
+void compute_image1( double xmin, double xmax, double ymin, double ymax, int maxiter, int width, int height, char* result, int threads){
+    int i, iter;
+	double xstep = (xmax-xmin) / (width-1);
+	double ystep = (ymax-ymin) / (height-1);
+
+	// Svaki proces ce paralelno izvrsavati ovu petlju, privatna promenljiva su i, iter
+    #pragma omp parallel shared(result, maxiter) private(i,iter) num_threads(threads)
+    #pragma omp for schedule(runtime)
+    for (i = 0; i < width*height; i++) {
+
+		double x = xmin + (i%width)*xstep;
+		double y = ymin + (i/height)*ystep;
+		
+		iter = compute_point(x,y,maxiter);
+        
+		int gray = 255 * iter / maxiter;
+
+        result[i] = (char)gray;
+    }
+	
+	stbi_write_jpg("fractal-images/shared-fractal.jpg", width, height, 1, result, 200);
+
+}
+
+
 int main( int argc, char *argv[] )
 {
-	// The initial boundaries of the fractal image in x,y space.
-	printf("adfasda");
-
 	double xmin=-1.5;
 	double xmax= 0.5;
 	double ymin=-1.0;
 	double ymax= 1.0;
 
-    int width = 1000;
-    int height = 1000;
+    int width = 1200;
+    int height = 1200;
 	int threadct = omp_get_max_threads();
 	int maxiter=5000;
-	printf("adfasda");
 
 	if (argc > 1)
     	threadct = atoi(argv[1]);
 	if(argc>2){
 		maxiter = atoi(argv[2]);
 	}
-	// Maximum number of iterations to compute.
-	// Higher values take longer but have more detail.
 
-	// Showing the configuration, just in case you want to recreate it.
 	printf("Coordinates: %lf %lf %lf %lf\n",xmin,xmax,ymin,ymax);
 	printf("Timer started\n");
-	printf("adfasda2");
 
-	// clock_t begin = clock();
-	// clock_t end = clock();
-	
-	// double time_spent = omp_get_wtime();
 	double start; 
 	double end; 
 	start = omp_get_wtime(); 
-		printf("adfasda3");
+	char* result = (char *) malloc(width*height);
 
-	compute_image(xmin,xmax,ymin,ymax,maxiter, width, height,threadct);
+	compute_image1(xmin,xmax,ymin,ymax,maxiter, width, height,result, threadct);
+	// compute_image(xmin,xmax,ymin,ymax,maxiter, width, height,threadct);
 
 	end = omp_get_wtime(); 
 	printf("Work took %f seconds\n", end - start);
-	// printf("time took for execution of parallel algorithm with shared memory: %f\n", time_spent);
-	// testOMP();
+
 	return 0;
 }
