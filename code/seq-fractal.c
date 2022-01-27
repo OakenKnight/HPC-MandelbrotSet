@@ -70,7 +70,7 @@ void compute_image( double xmin, double xmax, double ymin, double ymax, int maxi
 		}
 
 	}
-     stbi_write_jpg("fractal.jpg", width, height, 1, buffer, 200);
+     stbi_write_jpg("fractal-images/fractal.jpg", width, height, 1, buffer, 200);
 
 }
 
@@ -83,8 +83,8 @@ int main( int argc, char *argv[] )
 	double ymin=-1.0;
 	double ymax= 1.0;
 
-    int width = 1000;
-    int height = 1000;
+    int width = 120;
+    int height = 120;
 
 	// Maximum number of iterations to compute.
 	// Higher values take longer but have more detail.

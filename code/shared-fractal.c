@@ -58,25 +58,25 @@ static int compute_point( double x, double y, int max )
 // double start; 
 // 	double end; 
 // 	start = omp_get_wtime(); 
-		while( cabs(z)<4 && iter < max ) {
-				z = cpow(z,2) + alpha;
-				iter++;
-			}
-// 		// {
-// 		// 	#pragma omp parallel
-// 		// 	{
-// 		// 		#pragma omp single
-// 		// 		while (cabs(z)<4 && iter < max) {
-// 		// 			{
-// 		// 				#pragma omp task 
-// 		// 				z=calculateZ(z, 2, alpha);
+	while( cabs(z)<4 && iter < max ) {
+		z = cpow(z,2) + alpha;
+		iter++;
+	}
+		// {
+		// 	#pragma omp parallel
+		// 	{
+		// 		#pragma omp single
+		// 		while (cabs(z)<4 && iter < max) {
+		// 			{
+		// 				#pragma omp task 
+		// 				z=calculateZ(z, 2, alpha);
 
-// 		// 			}
-// 		// 			#pragma omp atomic
-// 		// 			iter++;
-// 		// 		}
-// 		// 	}
-// 		// }
+		// 			}
+		// 			#pragma omp atomic
+		// 			iter++;
+		// 		}
+		// 	}
+		// }
         
 
 // 	end = omp_get_wtime(); 
@@ -148,7 +148,7 @@ void compute_image( double xmin, double xmax, double ymin, double ymax, int maxi
 		}
 
 	}
-     stbi_write_jpg("shared-fractal.jpg", width, height, 1, buffer, 200);
+     stbi_write_jpg("fractal-images/shared-fractal.jpg", width, height, 1, buffer, 200);
 
 }
 
@@ -161,8 +161,8 @@ int main( int argc, char *argv[] )
 	double ymin=-1.0;
 	double ymax= 1.0;
 
-    int width = 120;
-    int height = 120;
+    int width = 1000;
+    int height = 1000;
 	int threadct = omp_get_max_threads();
 	int maxiter=5000;
 
