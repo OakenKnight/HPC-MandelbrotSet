@@ -44,22 +44,37 @@ void compute_image( double xmin, double xmax, double ymin, double ymax, int maxi
 		}
 
 	}
-     stbi_write_jpg("fractal-images/fractal.jpg", width, height, 1, buffer, 200);
 
+    stbi_write_jpg("fractal-images/fractal.jpg", width, height, 1, buffer, 200);
+	
 }
 
 int main( int argc, char *argv[] )
 {
-
+	FILE *out_file = fopen("code/data/seq.txt", "a");
+    if (out_file == NULL) {   
+		printf("Error! Could not open file\n"); 
+        exit(-1);
+    } 
+         
 	double xmin=-1.5;
 	double xmax= 0.5;
 	double ymin=-1.0;
 	double ymax= 1.0;
 
-    int width = 1000;
-    int height = 1000;
+    int width = 128;
+    int height = 128;
 	
-	int maxiter=1000;
+	int maxiter=100;
+
+	if (argc > 1)
+    	height = atoi(argv[1]);
+	if(argc>2){
+		width = atoi(argv[2]);
+	}
+	if(argc>3){
+		maxiter = atoi(argv[3]);
+	}
 
 	printf("Timer started\n");
 
@@ -68,6 +83,8 @@ int main( int argc, char *argv[] )
 	clock_t end = clock();
 
 	double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    
+	fprintf(out_file, "%f & ", time_spent); // write to file 
 
 	printf("time took for execution of sequential algorithm: %f\n", time_spent);
 

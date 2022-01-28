@@ -29,3 +29,4 @@ clean:
 	@rm -f distributed-fractal
 	@rm -f fractal-images/distrib-fractal.jpg
 	@rm -f gpu-fractal
+	@rm -f fractal-images/cuda-fractal.jpg

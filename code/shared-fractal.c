@@ -86,6 +86,11 @@ void compute_image_opt( double xmin, double xmax, double ymin, double ymax, int 
 
 int main( int argc, char *argv[] )
 {
+	FILE *out_file = fopen("code/data/shared.txt", "a");
+    if (out_file == NULL) {   
+		printf("Error! Could not open file\n"); 
+        exit(-1);
+    } 
 	double xmin=-1.5;
 	double xmax= 0.5;
 	double ymin=-1.0;
@@ -95,12 +100,17 @@ int main( int argc, char *argv[] )
     int height = 1200;
 	int threadct = omp_get_max_threads();
 	int maxiter=5000;
-
+	
 	if (argc > 1)
-    	threadct = atoi(argv[1]);
+    	height = atoi(argv[1]);
 	if(argc>2){
-		maxiter = atoi(argv[2]);
+		width = atoi(argv[2]);
 	}
+	if(argc>3){
+		maxiter = atoi(argv[3]);
+	}
+
+
 
 	printf("Coordinates: %lf %lf %lf %lf\n",xmin,xmax,ymin,ymax);
 	printf("Timer started\n");
