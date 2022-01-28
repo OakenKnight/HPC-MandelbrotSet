@@ -35,8 +35,8 @@ void compute_image( double xmin, double xmax, double ymin, double ymax, int maxi
 	double xstep = (xmax-xmin) / (width-1);
 	double ystep = (ymax-ymin) / (height-1);
 
-    #pragma omp parallel shared(result, maxiter, start, end) private(i,iter)
-    #pragma omp for schedule(runtime)
+//    #pragma omp parallel shared(result, maxiter, start, end) private(i,iter)
+    #pragma omp parallel for shared(result, maxiter, start, end) private(i,iter)
     for (i = start; i < end; i++) {
 
 		double x = xmin + (i%width)*xstep;
@@ -94,6 +94,13 @@ void run(int maxiter, int current_processor, int processors_amount, int width, i
 
 int  main( int argc, char **argv ){
 
+
+	FILE *out_file = fopen("code/data/distributed.txt", "a");
+    if (out_file == NULL) {   
+		printf("Error! Could not open file\n"); 
+        exit(-1);
+    } 
+
 	double xmin=-1.5;
 	double xmax= 0.5;
 	double ymin=-1.0;
@@ -103,6 +110,14 @@ int  main( int argc, char **argv ){
     int height = 1200;
 	int maxiter=5000;
 
+	if (argc > 1)
+    	height = atoi(argv[1]);
+	if(argc>2){
+		width = atoi(argv[2]);
+	}
+	if(argc>3){
+		maxiter = atoi(argv[3]);
+	}
 
     int size, rank;
 	

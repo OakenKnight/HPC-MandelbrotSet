@@ -98,6 +98,12 @@ static void run(double xmin, double xmax, double ymin, double ymax, int width, i
 }
 
 int main(int argc, char** argv){
+    
+	FILE *out_file = fopen("code/data/cuda.txt", "a");
+    if (out_file == NULL) {   
+		printf("Error! Could not open file\n"); 
+        exit(-1);
+    } 
     cudaError_t err = cudaSuccess;
 
     int width = 300;
@@ -109,11 +115,28 @@ int main(int argc, char** argv){
 	double ymin=-1.0;
 	double ymax= 1.0;
 
+
+	if (argc > 1)
+    	height = atoi(argv[1]);
+	if(argc>2){
+		width = atoi(argv[2]);
+	}
+	if(argc>3){
+		max_iter = atoi(argv[3]);
+	}
+	clock_t begin = clock();
+
     char *result = NULL;
     err = cudaMalloc(&result, width*height*sizeof(char));
     checkErr(err, "Failed to allocate result memory on gpu");
 
     run(xmin, xmax, ymin, ymax, width, height, max_iter, result);
+	clock_t end = clock();
+double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    
+	fprintf(out_file, "%f & ", time_spent); // write to file 
+
+	printf("time took for execution of sequential algorithm: %f\n", time_spent);
 
     cudaFree(result);
 	return 0;
