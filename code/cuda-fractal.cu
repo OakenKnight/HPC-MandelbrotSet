@@ -110,7 +110,7 @@ __host__  static void run(double xmin, double xmax, double ymin, double ymax, in
     }else{
         num_of_chanels=1;
     }
-    dim3 numBlocks(width,height*num_of_chanels);
+    dim3 numBlocks(width*num_of_chanels,height);
 
     cudaError_t err = cudaSuccess;
     compute_image_kernel<<<width*num_of_chanels, height>>>(xmin, xmax, ymin, ymax, max_iter, width, height, result, num_of_chanels);
@@ -163,7 +163,6 @@ int main(int argc, char** argv){
     }
 
 
-    char *result = NULL;
 	clock_t begin = clock();
 
     if(rgb==0){
@@ -172,7 +171,8 @@ int main(int argc, char** argv){
     else{
         num_of_chanels=3;
     }
-    
+
+    char *result = NULL;
     err = cudaMalloc(&result, width * height * num_of_chanels * sizeof(char));
     checkErr(err, "Failed to allocate result memory on gpu\n");
     run(xmin, xmax, ymin, ymax, width, height, max_iter, result, rgb);
