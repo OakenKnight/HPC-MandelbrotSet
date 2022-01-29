@@ -83,6 +83,41 @@ void compute_image_opt( double xmin, double xmax, double ymin, double ymax, int 
 
 }
 
+void compute_image_rgb( double xmin, double xmax, double ymin, double ymax, int maxiter, int width, int height, char* result, int threads, int num_chanels, int rgb){
+    int i, iter;
+	char name[60];
+
+	double xstep = (xmax-xmin) / (width-1);
+	double ystep = (ymax-ymin) / (height-1);
+
+    #pragma omp parallel shared(result, maxiter) private(i,iter) num_threads(threads)
+    #pragma omp for schedule(runtime)
+    for (i = 0; i < width*height; i++) {
+
+		double x = xmin + (i%width)*xstep;
+		double y = ymin + (i/height)*ystep;
+		
+		iter = compute_point(x,y,maxiter);
+        
+		if(rgb==1){
+        	result[num_chanels*i ] = (unsigned char) ((int)(iter* sin(iter/maxiter))%255);
+        	result[num_chanels*i +1] = (unsigned char)(iter%256);
+        	result[num_chanels*i +2] = (unsigned char) ((iter*iter)%255);
+		}
+		else{
+			int gray = 255 * iter / maxiter;
+			result[i] = (unsigned char) gray;
+		}
+
+    }
+	if(rgb==1){
+		sprintf(name,"fractal-images/shared/rgb_img%dx%d_%d.jpg", width, height, maxiter);
+	}else{	
+		sprintf(name,"fractal-images/shared/bw_img%dx%d_%d.jpg", width, height, maxiter);
+	}
+	stbi_write_jpg(name, width, height, num_chanels, result, 200);
+
+}
 
 int main( int argc, char *argv[] )
 {
@@ -99,8 +134,8 @@ int main( int argc, char *argv[] )
     int width = 1200;
     int height = 1200;
 	int threadct = omp_get_max_threads();
-	int maxiter=5000;
-	
+	int maxiter=10;
+	int rgb = 1;
 	if (argc > 1)
     	height = atoi(argv[1]);
 	if(argc>2){
@@ -110,21 +145,33 @@ int main( int argc, char *argv[] )
 		maxiter = atoi(argv[3]);
 	}
 
+	if(argc>4){
+		rgb = atoi(argv[4]);
+	}
 
 
-	printf("Coordinates: %lf %lf %lf %lf\n",xmin,xmax,ymin,ymax);
 	printf("Timer started\n");
 
 	double start; 
 	double end; 
+	int num_chanels;
+	if(rgb==1){
+		num_chanels=3;
+	}
+	else{
+		num_chanels=1;
+	}
+
+	unsigned char buffer[width*height*num_chanels];
+
 	start = omp_get_wtime(); 
-	char* result = (char *) malloc(width*height);
-
-	compute_image_opt(xmin,xmax,ymin,ymax,maxiter, width, height,result, threadct);
+	compute_image_rgb(xmin,xmax,ymin,ymax,maxiter, width, height,buffer, threadct, num_chanels, rgb);
 	// compute_image(xmin,xmax,ymin,ymax,maxiter, width, height,threadct);
-
 	end = omp_get_wtime(); 
-	printf("Work took %f seconds\n", end - start);
+	double time_spent = end - start;
+	fprintf(out_file, "%d,%d,%d,%f,%d \n", width, height, maxiter, time_spent,rgb); // write to file 
+
+	printf("Time took for shared memory parallel algorithm with parameters(%dx%d,%d) %f seconds\n",  width, height, maxiter,time_spent);
 
 	return 0;
 }
