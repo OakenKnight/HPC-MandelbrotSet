@@ -68,33 +68,8 @@ __global__ void compute_image_kernel(double xmin, double xmax, double ymin, doub
 		    int gray = 255 * iter / maxiter;
             result[ih * width + iw]  = (char)gray;
         }
-      
-
-
-    
+          
     }
-
-    if (gridDim.x * blockDim.x * pix_per_thread < width * height && tId < (width * height) - (blockDim.x * gridDim.x)){
-        int i = blockDim.x * gridDim.x * pix_per_thread + tId;
-        
-        int iw = i%width;
-        int ih = i/height;
-        
-        double x = xmin + iw*xstep;
-		double y = ymin + ih*ystep;
-
-        iter = compute_point(x, y, maxiter);
-        if(num_of_chanels>1){
-            result[num_of_chanels*(ih * width + iw)]  = (char) ((int)(iter * iter/maxiter)%255);
-            result[num_of_chanels*(ih * width + iw) + 1]  = (char)(iter%256); 
-            result[num_of_chanels*(ih * width + iw) + 2]  = (char) ((iter*iter)%255);    
-        }else{
-		    int gray = 255 * iter / maxiter;
-            result[ih * width + iw]  = (char)gray;
-        }
-
-    }
-    
     
 }
 
@@ -110,10 +85,10 @@ __host__  static void run(double xmin, double xmax, double ymin, double ymax, in
     }else{
         num_of_chanels=1;
     }
-    dim3 numBlocks(width*num_of_chanels,height);
+    dim3 numBlocks(width,height);
 
     cudaError_t err = cudaSuccess;
-    compute_image_kernel<<<width*num_of_chanels, height>>>(xmin, xmax, ymin, ymax, max_iter, width, height, result, num_of_chanels);
+    compute_image_kernel<<<width, height>>>(xmin, xmax, ymin, ymax, max_iter, width, height, result, num_of_chanels);
     checkErr(err, "Failed to run Kernel\n");
     void *data = malloc(height * width * num_of_chanels * sizeof(char));
     err = cudaMemcpy(data, result, width * height * num_of_chanels *sizeof(char), cudaMemcpyDeviceToHost);
@@ -180,7 +155,7 @@ int main(int argc, char** argv){
 	clock_t end = clock();
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     
-	fprintf(out_file, "%d,%d,%d,%f,%d \n", width, height, max_iter, time_spent,rgb); // write to file 
+	// fprintf(out_file, "%d,%d,%d,%f,%d \n", width, height, max_iter, time_spent,rgb); // write to file 
 
 	printf("time took for execution of cuda parallel algorithm with parameters(%dx%d,%d): %f\n", width,height,max_iter,time_spent);
 
